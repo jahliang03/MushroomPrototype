@@ -18,13 +18,16 @@ class IdleState extends State {
   }
 
   execute(scene, hero) {
-    const { left, right, up, down } = scene.keys;
+    const { left, right, up, down, throw: throwKey } = scene.keys;
     //transition to new states
     if (left.isDown || right.isDown || up.isDown || down.isDown) {
       this.stateMachine.transition("move");
       return;
     }
 
+    if (Phaser.Input.Keyboard.JustDown(throwKey)) {
+      this.stateMachine.transition("throw");
+    }
     /*scene.input.on('pointerdown', function (pointer)
         {
             this.stateMachine.transition('idleSwing');
@@ -34,7 +37,7 @@ class IdleState extends State {
 
 class MoveState extends State {
   execute(scene, hero) {
-    const { left, right, up, down } = scene.keys;
+    const { left, right, up, down, throw: throwKey } = scene.keys;
 
     let direction = new Phaser.Math.Vector2(0);
     //Character movement
@@ -71,5 +74,20 @@ class MoveState extends State {
       hero.setVelocityX(0);
       hero.direction.x = 0;
     }
+    if (Phaser.Input.Keyboard.JustDown(throwKey)) {
+      this.stateMachine.transition("throw");
+    }
+  }
+}
+
+class ThrowState extends State {
+  execute(scene, hero) {
+    const mushroom = scene.mushroomBombs.create(hero.x, hero.y, "mushroomBomb");
+
+    // Set an initial velocity to simulate an arc
+    mushroom.setVelocity(250 * hero.direction.x, -150); // Adjust values for a better arc
+    mushroom.setGravityY(300); // Gravity to pull the mushroom down
+    this.stateMachine.transition("idle");
+    return;
   }
 }
