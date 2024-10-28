@@ -1,9 +1,11 @@
-class Play extends Phaser.Scene {
+class play extends Phaser.Scene {
   constructor() {
     super("playScene");
   }
   preload() {}
 
-  create() {}
+  create() {
+    this.add.sprite(100, 100, "mushroomBomb");
+  }
   update() {}
 }
