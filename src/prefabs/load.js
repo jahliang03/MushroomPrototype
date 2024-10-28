@@ -4,8 +4,12 @@ class Load extends Phaser.Scene {
   }
   preload() {
     this.load.image(
-      "mushroomBomb",
+      "mushroomPlayer",
       "./assets/mushrooms/PNG/tallShroom_red.png"
+    );
+    this.load.image(
+      "mushroomBomb",
+      "./assets/mushrooms/PNG/tinyShroom_red.png"
     );
   }
   create() {
