@@ -13,6 +13,8 @@ class Play extends Phaser.Scene {
       throw: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
 
+    this.add.sprite(config.width / 2, config.height / 2, "mushroomBG");
+
     this.mobs = this.add.group(); //Creating group to add all mobs
     addMob(this.mobs, this);
     this.testMobDead = false;

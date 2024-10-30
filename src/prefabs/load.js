@@ -11,6 +11,10 @@ class Load extends Phaser.Scene {
       "mushroomBomb",
       "./assets/mushrooms/PNG/tinyShroom_red.png"
     );
+    this.load.image(
+      "mushroomBG",
+      "./assets/mushrooms/Backgrounds/bg_shroom.png"
+    );
   }
   create() {
     this.scene.start("playScene");
