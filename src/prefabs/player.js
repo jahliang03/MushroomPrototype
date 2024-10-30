@@ -6,7 +6,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     //set player values
     this.direction = new Phaser.Math.Vector2(0);
-    this.velocityS = 100;
+    this.velocityS = 150;
   }
 }
 class IdleState extends State {
