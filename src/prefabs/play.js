@@ -22,6 +22,7 @@ class Play extends Phaser.Scene {
     this.testMobDead = false;
 
     this.player = new Player(this, 100, 100, "mushroomPlayer");
+    this.player.setScale(0.3);
     this.physics.add.existing(this.player);
 
     // Player state machine initialization

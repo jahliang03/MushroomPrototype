@@ -5,7 +5,7 @@ class Load extends Phaser.Scene {
   preload() {
     this.load.image(
       "mushroomPlayer",
-      "./assets/mushrooms/PNG/tallShroom_red.png"
+      "./assets/mushrooms/sprites/racoon.png"
     );
     this.load.image(
       "mushroomBomb",
