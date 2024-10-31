@@ -2,7 +2,9 @@ class Play extends Phaser.Scene {
   constructor() {
     super("playScene");
   }
-  preload() {}
+
+  preload() {
+  }
 
   create() {
     this.keys = this.input.keyboard.addKeys({
@@ -15,13 +17,14 @@ class Play extends Phaser.Scene {
 
     this.add.sprite(config.width / 2, config.height / 2, "mushroomBG");
 
-    this.mobs = this.add.group(); //Creating group to add all mobs
+    this.mobs = this.add.group(); // Creating group to add all mobs
     addMob(this.mobs, this);
     this.testMobDead = false;
 
     this.player = new Player(this, 100, 100, "mushroomPlayer");
     this.physics.add.existing(this.player);
-    //Player state machine initialization
+
+    // Player state machine initialization
     this.playerFSM = new StateMachine(
       "idle",
       {
@@ -36,9 +39,17 @@ class Play extends Phaser.Scene {
     this.mushroomBombs = this.physics.add.group();
 
     this.physics.add.overlap(this.mushroomBombs, this.mobs, (enemy, bomb) => {
-      enemy.destroy();
+      enemy.health -= 1;
+      enemy.healthText.setText(enemy.health); // Update health display
       bomb.destroy();
-      this.testMobDead = true;
+
+      if (enemy.health <= 0) {
+        enemy.healthText.destroy(); // Remove health display
+        enemy.destroy();
+        this.testMobDead = true;
+      } else {
+        enemy.hit = true; // Mark enemy as hit
+      }
     });
   }
 
@@ -54,51 +65,55 @@ class Play extends Phaser.Scene {
       addMob(this.mobs, this);
       this.testMobDead = false;
     }
-    mobMovement(this.mobs, this); //Checks which mobs need to move
+    mobMovement(this.mobs, this); // Checks which mobs need to move
   }
 }
 
 function mobMovement(mobList, scene) {
   mobList.children.each(function (enemy) {
-    //Mobs check distance from player and move accordingly
-    //if (!enemy.hit) {
-    if (Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 300) {
-      // if player to left of enemy AND enemy moving to right (or not moving)
+    // Only move if the enemy has been hit
+    if (enemy.hit && Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 300) {
       if (scene.player.x < enemy.x && enemy.body.velocity.x >= 0) {
-        // move enemy to left
         enemy.setVelocityX(-enemy.speed);
-      }
-      // if player to right of enemy AND enemy moving to left (or not moving)
-      else if (scene.player.x > enemy.x && enemy.body.velocity.x <= 0) {
-        // move enemy to right
+      } else if (scene.player.x > enemy.x && enemy.body.velocity.x <= 0) {
         enemy.setVelocityX(enemy.speed);
       }
 
       if (scene.player.y < enemy.y && enemy.body.velocity.y >= 0) {
-        // move enemy to left
         enemy.setVelocityY(-enemy.speed);
-      }
-      // if player to right of enemy AND enemy moving to left (or not moving)
-      else if (scene.player.y > enemy.y && enemy.body.velocity.y <= 0) {
-        // move enemy to right
+      } else if (scene.player.y > enemy.y && enemy.body.velocity.y <= 0) {
         enemy.setVelocityY(enemy.speed);
       }
     } else {
       enemy.setVelocity(0);
     }
-    //}
+    enemy.healthText.setPosition(enemy.x, enemy.y - 20);
   }, scene);
 }
 
 function addMob(mobGroup, scene) {
-  //Adds enemy to given group
+  // Adds enemy to given group
   let enem = scene.physics.add.sprite(
-    Math.random() * config.width - 100 + 100,
-    Math.random() * config.height - 100 + 100,
-    "mushroomBomb"
+    Math.random() * (config.width - 200) + 100,
+    Math.random() * (config.height - 200) + 100,
+    "mushroomBomb" // Enemy texture
   );
   enem.body.setCollideWorldBounds(true);
   enem.body.setImmovable();
   enem.speed = 50;
+  enem.health = 5;
+  enem.hit = false;
+
+  enem.healthText = scene.add.text(enem.x, enem.y - 20, enem.health, {
+    font: "16px Arial",
+    fill: "#ff0000",
+  }).setOrigin(0.5);
+
+  // Override preUpdate to make the text follow the enemy
+  enem.preUpdate = function (time, delta) {
+    Phaser.Physics.Arcade.Sprite.prototype.preUpdate.call(this, time, delta);
+    this.healthText.setPosition(this.x, this.y - 20);
+  };
+
   mobGroup.add(enem);
 }
