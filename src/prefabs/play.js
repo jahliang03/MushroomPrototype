@@ -60,7 +60,13 @@ class Play extends Phaser.Scene {
       }
     });
 
-    this.physics.add.collider(this.mobs, this.player, this.onPlayerDeath, null, this);
+    this.physics.add.collider(
+      this.mobs,
+      this.player,
+      this.onPlayerDeath,
+      null,
+      this
+    );
   }
 
   onPlayerDeath(player, mob) {
@@ -121,15 +127,16 @@ function mobMovement(mobList, scene) {
           enemy.setVelocity(enemy.speed * direcX, enemy.speed * direcY);
         }
         enemy.toggleIdle = false;
-        scene.time.delayedCall(1000, idleToggle, [enemy], scene);
+        scene.time.delayedCall(1000, speedToggle, [enemy], scene);
       }
     }
     enemy.healthText.setPosition(enemy.x, enemy.y - 20);
   }, scene);
 }
 
-function idleToggle(object) {
+function speedToggle(object) {
   object.toggleIdle = true;
+  object.speed = Math.random() * 150 + 50;
 }
 
 function addMob(mobGroup, scene) {
