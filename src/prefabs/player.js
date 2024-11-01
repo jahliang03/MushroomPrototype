@@ -84,10 +84,27 @@ class ThrowState extends State {
   execute(scene, hero) {
     const mushroom = scene.mushroomBombs.create(hero.x, hero.y, "mushroomBomb");
 
-    // Set an initial velocity to simulate an arc
-    mushroom.setVelocity(250 * hero.direction.x, -150); // Adjust values for a better arc
+    // Set initial velocity to simulate an arc
+    mushroom.setVelocity(250 * hero.direction.x, -150); // Adjust for desired arc
     mushroom.setGravityY(300); // Gravity to pull the mushroom down
+
+    // Set initial scale and disable collision with mobs
+    mushroom.setScale(1); // Initial size
+    mushroom.body.setSize(mushroom.width, mushroom.height);
+    mushroom.body.checkCollision.none = true; // Temporarily disable collisions
+
+    // After 2 seconds, double size and enable collisions
+    scene.time.delayedCall(1000, () => {
+      mushroom.setScale(2); // Double the sprite size
+      mushroom.body.setSize(mushroom.width * 1, mushroom.height * 1); // Double hitbox size
+      mushroom.body.checkCollision.none = false; // Enable collision with mobs
+      scene.time.delayedCall(100, () => {
+        mushroom.destroy();
+      });
+    });
+
     this.stateMachine.transition("idle");
     return;
   }
 }
+

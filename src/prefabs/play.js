@@ -84,7 +84,7 @@ function mobMovement(mobList, scene) {
     // Only move if the enemy has been hit
     if (
       enemy.hit &&
-      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 300
+      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 500
     ) {
       if (scene.player.x < enemy.x && enemy.body.velocity.x >= 0) {
         enemy.setVelocityX(-enemy.speed);
@@ -134,7 +134,7 @@ function addMob(mobGroup, scene) {
   );
   enem.body.setCollideWorldBounds(true);
   enem.body.setImmovable();
-  enem.speed = 50;
+  enem.speed = 75;
   enem.health = 5;
   enem.hit = false;
   enem.toggleIdle = true;
