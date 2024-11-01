@@ -22,6 +22,7 @@ class Play extends Phaser.Scene {
     addMob(this.mobs, this);
 
     this.enemCount = 0;
+    this.lastThrowTime = 0;
 
     this.player = new Player(this, 100, 100, "mushroomPlayer");
     this.player.setScale(0.2);
@@ -58,6 +59,12 @@ class Play extends Phaser.Scene {
         enemy.hit = true; // Mark enemy as hit
       }
     });
+
+    this.physics.add.collider(this.mobs, this.player, this.onPlayerDeath, null, this);
+  }
+
+  onPlayerDeath(player, mob) {
+    this.scene.restart(); // Restart the scene upon player death
   }
 
   update() {
@@ -134,7 +141,7 @@ function addMob(mobGroup, scene) {
   );
   enem.body.setCollideWorldBounds(true);
   enem.body.setImmovable();
-  enem.speed = 75;
+  enem.speed = 100;
   enem.health = 5;
   enem.hit = false;
   enem.toggleIdle = true;
