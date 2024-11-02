@@ -2,9 +2,6 @@ class Play extends Phaser.Scene {
   constructor() {
     super("playScene");
   }
-
-  preload() {}
-
   create() {
     this.worldBoundX = 2000;
     this.worldBoundY = 2000;
@@ -20,8 +17,8 @@ class Play extends Phaser.Scene {
     this.background = this.add.tileSprite(
       0,
       0,
-      this.scale.width * 2, // Make it twice the screen width
-      this.scale.height * 2, // Make it twice the screen height
+      this.scale.width * 4, // Make screen width wider
+      this.scale.height * 4, // Make screen height taller
       "mushroomBG"
     ).setOrigin(0, 0);
 
