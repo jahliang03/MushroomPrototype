@@ -13,7 +13,7 @@ class Load extends Phaser.Scene {
     );
     this.load.image(
       "mushroomBG",
-      "./assets/mushrooms/Backgrounds/bg_shroom.png"
+      "./assets/mushrooms/Backgrounds/grass.png"
     );
     this.load.image(
       "enemy", 

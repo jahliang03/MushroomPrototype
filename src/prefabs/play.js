@@ -16,7 +16,14 @@ class Play extends Phaser.Scene {
       throw: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
 
-    this.add.sprite(config.width / 2, config.height / 2, "mushroomBG");
+    // this.add.sprite(config.width, config.height, "mushroomBG");
+    this.background = this.add.tileSprite(
+      0,
+      0,
+      this.scale.width * 2, // Make it twice the screen width
+      this.scale.height * 2, // Make it twice the screen height
+      "mushroomBG"
+    ).setOrigin(0, 0);
 
     this.mobs = this.add.group(); // Creating group to add all mobs
     addMob(this.mobs, this);
@@ -75,6 +82,10 @@ class Play extends Phaser.Scene {
 
   update() {
     const { left, right, up, down, throw: throwKey } = this.keys;
+
+     // Update background position to follow the player
+    this.background.tilePositionX = this.player.x - this.scale.width / 10;
+    this.background.tilePositionY = this.player.y - this.scale.height / 3;
 
     // Player movement logic
     this.playerFSM.step();
