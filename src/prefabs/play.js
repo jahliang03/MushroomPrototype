@@ -81,6 +81,10 @@ class Play extends Phaser.Scene {
     if (!left.isDown && !down.isDown && !up.isDown && !right.isDown) {
       this.player.setVelocity(0);
     }
+
+    // Update health text position to follow the player
+    this.player.updateHealthTextPosition();
+
     while (this.enemCount < 20) {
       addMob(this.mobs, this);
       this.enemCount++;

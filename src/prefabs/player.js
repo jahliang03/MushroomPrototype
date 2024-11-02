@@ -7,6 +7,39 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     // Set player values
     this.direction = new Phaser.Math.Vector2(0);
     this.velocityS = 150;
+    this.health = 5; // Initialize health
+    this.isAlive = true;
+
+    // Display health on the screen
+    this.healthText = scene.add.text(x, y - 50, `${this.health}`, {
+      font: "16px Arial",
+      fill: "#ffffff",
+    }).setOrigin(0.5);
+  }
+
+  takeDamage(amount) {
+    if (!this.isAlive) return;
+
+    this.health -= amount;
+    this.healthText.setText(`Health: ${this.health}`);
+
+    // Check if health is depleted
+    if (this.health <= 0) {
+      this.health = 0;
+      this.isAlive = false;
+      this.die();
+    }
+  }
+
+  die() {
+    this.setTint(0xff0000); // Optional: Add a red tint to indicate the player is dead
+    this.setVelocity(0); // Stop the player’s movement
+    this.body.enable = false; // Disable physics body to stop interactions
+    this.healthText.setText("Health: 0"); // Update health display
+  }
+
+  updateHealthTextPosition() {
+    this.healthText.setPosition(this.x, this.y - 30); // Keep health text above the player
   }
 }
 
