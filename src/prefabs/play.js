@@ -138,14 +138,14 @@ function speedToggle(object) {
   object.toggleIdle = true;
   object.speed = Math.random() * 150 + 50;
 }
-
 function addMob(mobGroup, scene) {
   // Adds enemy to given group
   let enem = scene.physics.add.sprite(
     Math.random() * (scene.worldBoundX - 100),
     Math.random() * (scene.worldBoundY - 100),
-    "mushroomBomb" // Enemy texture
+    "enemy" // Enemy texture
   );
+  enem.setScale(0.2);
   enem.body.setCollideWorldBounds(true);
   enem.body.setImmovable();
   enem.speed = 100;

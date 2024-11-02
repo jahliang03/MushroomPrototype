@@ -94,20 +94,24 @@ class ThrowState extends State {
     // Create the mushroom bomb
     const mushroom = scene.mushroomBombs.create(hero.x, hero.y, "mushroomBomb");
 
+    // Set initial smaller scale for the mushroom bomb
+    mushroom.setScale(0.1);
+    mushroom.body.setSize(mushroom.displayWidth, mushroom.displayHeight);
+
     // Set initial velocity to simulate an arc
-    mushroom.setVelocity(250 * hero.direction.x, -150);
+    mushroom.setVelocity(250 * hero.direction.x, -200);
     mushroom.setGravityY(300);
 
-    // Set initial scale and disable collision with mobs
-    mushroom.setScale(1); // Initial size
-    mushroom.body.setSize(mushroom.width, mushroom.height);
-    mushroom.body.checkCollision.none = true; // Temporarily disable collisions
+    // Temporarily disable collisions with mobs
+    mushroom.body.checkCollision.none = true;
 
-    // After 2 seconds, double size and enable collisions
+    // After 1 second, increase the size and enable collisions
     scene.time.delayedCall(1000, () => {
-      mushroom.setScale(2);
-      mushroom.body.setSize(mushroom.width * 1, mushroom.height * 1);
+      mushroom.setScale(0.1); // Increase size to 0.5
+      mushroom.body.setSize(mushroom.displayWidth, mushroom.displayHeight);
       mushroom.body.checkCollision.none = false;
+
+      // Destroy the bomb shortly after enabling collision
       scene.time.delayedCall(100, () => {
         mushroom.destroy();
       });
