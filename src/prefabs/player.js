@@ -107,7 +107,7 @@ class ThrowState extends State {
     mushroom.body.checkCollision.none = true;
 
     scene.time.delayedCall(1000, () => {
-      mushroom.setScale(0.2);
+      mushroom.setScale(0.1);
       mushroom.body.setSize(mushroom.displayWidth * 1, mushroom.displayHeight * 1);
       mushroom.body.checkCollision.none = false;
 
