@@ -2,6 +2,7 @@ class Play extends Phaser.Scene {
   constructor() {
     super("playScene");
   }
+
   create() {
     this.worldBoundX = 2000;
     this.worldBoundY = 2000;
@@ -13,16 +14,11 @@ class Play extends Phaser.Scene {
       throw: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
 
-    // this.add.sprite(config.width, config.height, "mushroomBG");
     this.background = this.add.tileSprite(
-      0,
-      0,
-      this.scale.width * 4, // Make screen width wider
-      this.scale.height * 4, // Make screen height taller
-      "mushroomBG"
+      0, 0, this.scale.width * 4, this.scale.height * 4, "mushroomBG"
     ).setOrigin(0, 0);
 
-    this.mobs = this.add.group(); // Creating group to add all mobs
+    this.mobs = this.add.group();
     addMob(this.mobs, this);
 
     this.enemCount = 0;
@@ -36,7 +32,6 @@ class Play extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
     this.physics.world.setBounds(0, 0, this.worldBoundX, this.worldBoundY);
 
-    // Player state machine initialization
     this.playerFSM = new StateMachine(
       "idle",
       {
@@ -47,115 +42,76 @@ class Play extends Phaser.Scene {
       [this, this.player]
     );
 
-    // Mushroom bomb group
     this.mushroomBombs = this.physics.add.group();
 
     this.physics.add.overlap(this.mushroomBombs, this.mobs, (enemy, bomb) => {
       enemy.health -= 1;
-      enemy.healthText.setText(enemy.health); // Update health display
+      enemy.healthText.setText(enemy.health);
       bomb.destroy();
-
       if (enemy.health <= 0) {
-        enemy.healthText.destroy(); // Remove health display
+        enemy.healthText.destroy();
         enemy.destroy();
-        this.testMobDead = true;
       } else {
-        enemy.hit = true; // Mark enemy as hit
+        enemy.hit = true;
       }
     });
 
-    this.physics.add.collider(
-      this.mobs,
-      this.player,
-      this.onPlayerDeath,
-      null,
-      this
-    );
+    this.physics.add.collider(this.mobs, this.player, this.onPlayerDeath, null, this);
   }
 
   onPlayerDeath(player, mob) {
-    this.scene.restart(); // Restart the scene upon player death
+    this.scene.restart();
   }
 
   update() {
     const { left, right, up, down, throw: throwKey } = this.keys;
 
-     // Update background position to follow the player
     this.background.tilePositionX = this.player.x - this.scale.width / 10;
     this.background.tilePositionY = this.player.y - this.scale.height / 3;
 
-    // Player movement logic
     this.playerFSM.step();
     if (!left.isDown && !down.isDown && !up.isDown && !right.isDown) {
       this.player.setVelocity(0);
     }
 
-    // Update health text position to follow the player
     this.player.updateHealthTextPosition();
 
     while (this.enemCount < 20) {
       addMob(this.mobs, this);
       this.enemCount++;
     }
-    mobMovement(this.mobs, this); // Checks which mobs need to move
+    mobMovement(this.mobs, this);
   }
 }
 
 function mobMovement(mobList, scene) {
-  if (mobList == null) {
-    return;
-  }
-  mobList.children.each(function (enemy) {
-    // Only move if the enemy has been hit
-    if (
-      enemy.hit &&
-      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 500
-    ) {
-      if (scene.player.x < enemy.x && enemy.body.velocity.x >= 0) {
-        enemy.setVelocityX(-enemy.speed);
-      } else if (scene.player.x > enemy.x && enemy.body.velocity.x <= 0) {
-        enemy.setVelocityX(enemy.speed);
-      }
-
-      if (scene.player.y < enemy.y && enemy.body.velocity.y >= 0) {
-        enemy.setVelocityY(-enemy.speed);
-      } else if (scene.player.y > enemy.y && enemy.body.velocity.y <= 0) {
-        enemy.setVelocityY(enemy.speed);
-      }
-    } else {
-      if (enemy.toggleIdle) {
-        //Idle movement for animals
-        let direcY = Math.floor(Math.random() * 2 + 1);
-        if (direcY % 2 == 0) {
-          direcY = -1;
-        }
-        let direcX = Math.floor(Math.random() * 2 + 1);
-        if (direcX % 2 == 0) {
-          direcX = -1;
-        }
-        if (Math.floor(Math.random() * 3) == 1) {
-          enemy.setVelocity(0);
-        } else {
-          enemy.setVelocity(enemy.speed * direcX, enemy.speed * direcY);
-        }
-        enemy.toggleIdle = false;
-        scene.time.delayedCall(1000, speedToggle, [enemy], scene);
-      }
+  if (!mobList) return;
+  mobList.children.each((enemy) => {
+    if (enemy.hit && Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 500) {
+      enemy.setVelocity(
+        enemy.x < scene.player.x ? enemy.speed : -enemy.speed,
+        enemy.y < scene.player.y ? enemy.speed : -enemy.speed
+      );
+    } else if (enemy.toggleIdle) {
+      const [direcX, direcY] = [Math.random() > 0.5 ? 1 : -1, Math.random() > 0.5 ? 1 : -1];
+      enemy.setVelocity(enemy.speed * direcX, enemy.speed * direcY);
+      enemy.toggleIdle = false;
+      scene.time.delayedCall(1000, speedToggle, [enemy], scene);
     }
     enemy.healthText.setPosition(enemy.x, enemy.y - 20);
-  }, scene);
+  });
 }
 
 function speedToggle(object) {
   object.toggleIdle = true;
   object.speed = Math.random() * 150 + 50;
 }
+
 function addMob(mobGroup, scene) {
-  // Adds enemy to given group
   let enem = scene.physics.add.sprite(
     Math.random() * (scene.worldBoundX - 100),
     Math.random() * (scene.worldBoundY - 100),
-    "enemy" // Enemy texture
+    "enemy"
   );
   enem.setScale(0.2);
   enem.body.setCollideWorldBounds(true);
@@ -172,7 +128,6 @@ function addMob(mobGroup, scene) {
     })
     .setOrigin(0.5);
 
-  // Override preUpdate to make the text follow the enemy
   enem.preUpdate = function (time, delta) {
     Phaser.Physics.Arcade.Sprite.prototype.preUpdate.call(this, time, delta);
     this.healthText.setPosition(this.x, this.y - 20);
