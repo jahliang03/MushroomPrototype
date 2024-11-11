@@ -8,8 +8,8 @@ class Load extends Phaser.Scene {
       "./assets/mushrooms/sprites/racoon.png"
     );
     this.load.image(
-      "mushroomBomb",
-      "assets/mushrooms/sprites/mushroom.PNG"
+      "bullet",
+      "assets/mushrooms/sprites/bullet.PNG"
     );
     this.load.image(
       "mushroomBG",

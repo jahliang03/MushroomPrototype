@@ -24,15 +24,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.health <= 0) {
       this.health = 0;
       this.isAlive = false;
-      this.die();
     }
-  }
-
-  die() {
-    this.setTint(0xff0000);
-    this.setVelocity(0);
-    this.body.enable = false;
-    this.healthText.setText("Health: 0");
   }
 
   updateHealthTextPosition() {
@@ -93,28 +85,27 @@ class MoveState extends State {
 class ThrowState extends State {
   execute(scene, hero) {
     const currentTime = scene.time.now;
-    if (currentTime - scene.lastThrowTime < 750) {
+
+    if (currentTime - scene.lastShootTime < 500) {
       this.stateMachine.transition("idle");
       return;
     }
-    scene.lastThrowTime = currentTime;
+    scene.lastShootTime = currentTime;
 
-    const mushroom = scene.mushroomBombs.create(hero.x, hero.y, "mushroomBomb");
-    mushroom.setScale(0.1);
-    mushroom.body.setSize(mushroom.displayWidth, mushroom.displayHeight);
-    mushroom.setVelocity(250 * hero.direction.x, -200);
-    mushroom.setGravityY(300);
-    mushroom.body.checkCollision.none = true;
+    const bullet = scene.mushroomBombs.create(hero.x, hero.y, "bullet");
+    bullet.setScale(1);
+    bullet.body.setSize(bullet.displayWidth, bullet.displayHeight);
+
+    bullet.setVelocity(300 * hero.direction.x, 300 * hero.direction.y);
+    const angle = Phaser.Math.Angle.Between(0, 0, hero.direction.x, hero.direction.y);
+    bullet.rotation = angle + Phaser.Math.PI2 / 4;
+
+    bullet.body.rotation = bullet.rotation;
+
+    bullet.body.checkCollision.none = true;
 
     scene.time.delayedCall(1000, () => {
-      mushroom.setScale(0.1);
-      mushroom.body.setSize(mushroom.displayWidth * 1, mushroom.displayHeight * 1);
-      mushroom.body.checkCollision.none = false;
-
-      // Destroy bomb after collision is enabled
-      scene.time.delayedCall(100, () => {
-        mushroom.destroy();
-      });
+      bullet.destroy();
     });
 
     this.stateMachine.transition("idle");

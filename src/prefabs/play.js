@@ -44,23 +44,23 @@ class Play extends Phaser.Scene {
 
     this.mushroomBombs = this.physics.add.group();
 
-    this.physics.add.overlap(this.mushroomBombs, this.mobs, (enemy, bomb) => {
-      enemy.health -= 1;
-      enemy.healthText.setText(enemy.health);
-      bomb.destroy();
-      if (enemy.health <= 0) {
-        enemy.healthText.destroy();
-        enemy.destroy();
-      } else {
-        enemy.hit = true;
-      }
-    });
-
-    this.physics.add.collider(this.mobs, this.player, this.onPlayerDeath, null, this);
+    // Add collision detection for mushroom bombs with mobs
+    this.physics.add.overlap(this.mushroomBombs, this.mobs, this.handleBombHit, null, this);
   }
 
-  onPlayerDeath(player, mob) {
-    this.scene.restart();
+  handleBombHit(bomb, enemy) {
+    // Decrease enemy health on bomb hit
+    enemy.health -= 1;
+    enemy.healthText.setText(enemy.health);
+    bomb.destroy();
+
+    // If the enemy's health is 0 or less, destroy it
+    if (enemy.health <= 0) {
+      enemy.healthText.destroy();
+      enemy.destroy();
+    } else {
+      enemy.hit = true; // Mark the enemy as hit
+    }
   }
 
   update() {
