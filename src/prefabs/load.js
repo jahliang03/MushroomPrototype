@@ -3,22 +3,10 @@ class Load extends Phaser.Scene {
     super("loadScene");
   }
   preload() {
-    this.load.image(
-      "mushroomPlayer",
-      "./assets/mushrooms/sprites/racoon.png"
-    );
-    this.load.image(
-      "bullet",
-      "assets/mushrooms/sprites/bullet.PNG"
-    );
-    this.load.image(
-      "mushroomBG",
-      "./assets/mushrooms/Backgrounds/grass.png"
-    );
-    this.load.image(
-      "enemy", 
-      "./assets/mushrooms/sprites/bunny.PNG"
-    );
+    this.load.image("mushroomPlayer", "./assets/mushrooms/sprites/racoon.png");
+    this.load.image("bullet", "assets/mushrooms/sprites/bullet.PNG");
+    this.load.image("mushroomBG", "./assets/mushrooms/Backgrounds/grass.png");
+    this.load.image("enemy", "./assets/mushrooms/sprites/bunny.PNG");
   }
   create() {
     this.scene.start("playScene");

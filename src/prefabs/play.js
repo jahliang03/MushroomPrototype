@@ -14,9 +14,15 @@ class Play extends Phaser.Scene {
       throw: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
 
-    this.background = this.add.tileSprite(
-      0, 0, this.scale.width * 4, this.scale.height * 4, "mushroomBG"
-    ).setOrigin(0, 0);
+    this.background = this.add
+      .tileSprite(
+        0,
+        0,
+        this.scale.width * 4,
+        this.scale.height * 4,
+        "mushroomBG",
+      )
+      .setOrigin(0, 0);
 
     this.mobs = this.add.group();
     addMob(this.mobs, this);
@@ -24,7 +30,10 @@ class Play extends Phaser.Scene {
     this.enemCount = 0;
     this.lastThrowTime = 0;
 
-    this.player = new Player(this, 100, 100, "mushroomPlayer");
+    this.player = new Player(this, 100, 100, "mushroomPlayer").setOrigin(
+      0.5,
+      0.5,
+    );
     this.player.setScale(0.2);
     this.physics.add.existing(this.player);
 
@@ -39,13 +48,18 @@ class Play extends Phaser.Scene {
         move: new MoveState(),
         throw: new ThrowState(),
       },
-      [this, this.player]
+      [this, this.player],
     );
 
     this.mushroomBombs = this.physics.add.group();
 
     // Add collision detection for mushroom bombs with mobs
-    this.physics.add.overlap(this.mushroomBombs, this.mobs, this.handleBombHit, () => true);
+    this.physics.add.overlap(
+      this.mushroomBombs,
+      this.mobs,
+      this.handleBombHit,
+      () => true,
+    );
     // arrow func allows processCallback to pass enemy and bomb to handleBombHit
   }
 
@@ -89,36 +103,61 @@ class Play extends Phaser.Scene {
 function mobMovement(mobList, scene) {
   if (!mobList) return;
   mobList.children.each((enemy) => {
-    if (enemy.hit && Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 500) {
+    if (Phaser.Math.Distance.BetweenPoints(enemy, scene.player) > 700) {
+      enemy.hit = false;
+      //enemy.speed = Math.random() > 0.5 ? 50 : -50;
+    }
+    if (
+      enemy.hit &&
+      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 700
+    ) {
       enemy.setVelocity(
-        enemy.x < scene.player.x ? enemy.speed : -enemy.speed,
-        enemy.y < scene.player.y ? enemy.speed : -enemy.speed
+        enemy.x < scene.player.x ? -enemy.speed * 2 : enemy.speed * 2,
+        enemy.y < scene.player.y ? -enemy.speed * 2 : enemy.speed * 2,
       );
+    } else if (
+      enemy.hit &&
+      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) > 700
+    ) {
+      enemy.hit = false;
+      enemy.speed = Math.random() > 0.5 ? 50 : -50;
     } else if (enemy.toggleIdle) {
-      const [direcX, direcY] = [Math.random() > 0.5 ? 1 : -1, Math.random() > 0.5 ? 1 : -1];
+      const [direcX, direcY] = [
+        Math.random() > 0.5 ? 1 : -1,
+        Math.random() > 0.5 ? 1 : -1,
+      ];
       enemy.setVelocity(enemy.speed * direcX, enemy.speed * direcY);
       enemy.toggleIdle = false;
-      scene.time.delayedCall(1000, speedToggle, [enemy], scene);
+      scene.time.delayedCall(1000, directionToggle, [enemy], scene);
     }
     enemy.healthText.setPosition(enemy.x, enemy.y - 20);
+    if (enemy.body.velocity.x > 0) {
+      enemy.setFlipX(true);
+    } else {
+      enemy.setFlipX(false);
+    }
   });
 }
 
-function speedToggle(object) {
+function directionToggle(object) {
   object.toggleIdle = true;
-  object.speed = Math.random() * 150 + 50;
+  const [direcX, direcY] = [
+    Math.random() > 0.5 ? 1 : -1,
+    Math.random() > 0.5 ? 1 : -1,
+  ];
+  object.setVelocity(object.speed * direcX, object.speed * direcY);
 }
 
 function addMob(mobGroup, scene) {
   let enemy = scene.physics.add.sprite(
     Math.random() * (scene.worldBoundX - 100),
     Math.random() * (scene.worldBoundY - 100),
-    "enemy"
+    "enemy",
   );
   enemy.setScale(0.2);
   enemy.body.setCollideWorldBounds(true);
   enemy.body.setImmovable();
-  enemy.speed = 100;
+  enemy.speed = 50;
   enemy.health = 5;
   enemy.hit = false;
   enemy.toggleIdle = true;

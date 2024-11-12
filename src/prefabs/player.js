@@ -11,10 +11,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.isAlive = true;
 
     // Display health on the screen
-    this.healthText = scene.add.text(x, y - 50, `${this.health}`, {
-      font: "16px Arial",
-      fill: "#ffffff",
-    }).setOrigin(0.5);
+    this.healthText = scene.add
+      .text(x, y - 50, `${this.health}`, {
+        font: "16px Arial",
+        fill: "#ffffff",
+      })
+      .setOrigin(0.5);
   }
 
   takeDamage(amount) {
@@ -68,6 +70,11 @@ class MoveState extends State {
     }
 
     if (left.isDown || right.isDown) {
+      if (left.isDown) {
+        hero.setFlipX(true);
+      } else {
+        hero.setFlipX(false);
+      }
       hero.direction.x = left.isDown ? -1 : 1;
       hero.direction.normalize();
       hero.body.setVelocityX(hero.velocityS * hero.direction.x);
@@ -86,7 +93,7 @@ class ThrowState extends State {
   execute(scene, hero) {
     const currentTime = scene.time.now;
 
-    if (currentTime - scene.lastShootTime < 500) {
+    if (currentTime - scene.lastShootTime < 300) {
       this.stateMachine.transition("idle");
       return;
     }
@@ -97,16 +104,17 @@ class ThrowState extends State {
     bullet.body.setSize(bullet.displayWidth, bullet.displayHeight);
 
     bullet.setVelocity(300 * hero.direction.x, 300 * hero.direction.y);
-    const angle = Phaser.Math.Angle.Between(0, 0, hero.direction.x, hero.direction.y);
+    const angle = Phaser.Math.Angle.Between(
+      0,
+      0,
+      hero.direction.x,
+      hero.direction.y,
+    );
     bullet.rotation = angle + Phaser.Math.PI2 / 4;
 
     bullet.body.rotation = bullet.rotation;
 
     bullet.body.checkCollision.none = false;
-
-    scene.time.delayedCall(1000, () => {
-      bullet.destroy();
-    });
 
     this.stateMachine.transition("idle");
   }
