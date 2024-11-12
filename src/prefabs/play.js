@@ -45,10 +45,12 @@ class Play extends Phaser.Scene {
     this.mushroomBombs = this.physics.add.group();
 
     // Add collision detection for mushroom bombs with mobs
-    this.physics.add.overlap(this.mushroomBombs, this.mobs, this.handleBombHit, null, this);
+    this.physics.add.overlap(this.mushroomBombs, this.mobs, this.handleBombHit, () => true);
+    // arrow func allows processCallback to pass enemy and bomb to handleBombHit
   }
 
-  handleBombHit(bomb, enemy) {
+  handleBombHit(enemy, bomb) {
+    // VERY IMPORTANT TO KEEP VARS PASSED THIS WAY
     // Decrease enemy health on bomb hit
     enemy.health -= 1;
     enemy.healthText.setText(enemy.health);
@@ -108,30 +110,30 @@ function speedToggle(object) {
 }
 
 function addMob(mobGroup, scene) {
-  let enem = scene.physics.add.sprite(
+  let enemy = scene.physics.add.sprite(
     Math.random() * (scene.worldBoundX - 100),
     Math.random() * (scene.worldBoundY - 100),
     "enemy"
   );
-  enem.setScale(0.2);
-  enem.body.setCollideWorldBounds(true);
-  enem.body.setImmovable();
-  enem.speed = 100;
-  enem.health = 5;
-  enem.hit = false;
-  enem.toggleIdle = true;
+  enemy.setScale(0.2);
+  enemy.body.setCollideWorldBounds(true);
+  enemy.body.setImmovable();
+  enemy.speed = 100;
+  enemy.health = 5;
+  enemy.hit = false;
+  enemy.toggleIdle = true;
 
-  enem.healthText = scene.add
-    .text(enem.x, enem.y - 20, enem.health, {
+  enemy.healthText = scene.add
+    .text(enemy.x, enemy.y - 20, enemy.health, {
       font: "16px Arial",
       fill: "#ff0000",
     })
     .setOrigin(0.5);
 
-  enem.preUpdate = function (time, delta) {
+  enemy.preUpdate = function (time, delta) {
     Phaser.Physics.Arcade.Sprite.prototype.preUpdate.call(this, time, delta);
     this.healthText.setPosition(this.x, this.y - 20);
   };
 
-  mobGroup.add(enem);
+  mobGroup.add(enemy);
 }

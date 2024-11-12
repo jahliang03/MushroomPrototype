@@ -102,7 +102,7 @@ class ThrowState extends State {
 
     bullet.body.rotation = bullet.rotation;
 
-    bullet.body.checkCollision.none = true;
+    bullet.body.checkCollision.none = false;
 
     scene.time.delayedCall(1000, () => {
       bullet.destroy();
