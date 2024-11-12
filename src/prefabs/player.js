@@ -103,7 +103,7 @@ class ThrowState extends State {
     bullet.setScale(1);
     bullet.body.setSize(bullet.displayWidth, bullet.displayHeight);
 
-    bullet.setVelocity(300 * hero.direction.x, 300 * hero.direction.y);
+    bullet.setVelocity(500 * hero.direction.x, 500 * hero.direction.y);
     const angle = Phaser.Math.Angle.Between(
       0,
       0,

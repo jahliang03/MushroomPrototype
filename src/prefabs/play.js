@@ -6,13 +6,9 @@ class Play extends Phaser.Scene {
   create() {
     this.worldBoundX = 2000;
     this.worldBoundY = 2000;
-    this.keys = this.input.keyboard.addKeys({
-      up: "W",
-      left: "A",
-      down: "S",
-      right: "D",
-      throw: Phaser.Input.Keyboard.KeyCodes.SPACE,
-    });
+
+    // Initialize enemCount before using it
+    this.enemCount = 0;
 
     this.background = this.add
       .tileSprite(
@@ -24,10 +20,26 @@ class Play extends Phaser.Scene {
       )
       .setOrigin(0, 0);
 
+    this.enemyCountText = this.add
+      .text(20, 20, `Animals left... ${this.enemCount}`, {
+        font: "20px Arial",
+        fill: "#ffffff",
+      })
+      .setScrollFactor(0);
+
+    this.keys = this.input.keyboard.addKeys({
+      up: "W",
+      left: "A",
+      down: "S",
+      right: "D",
+      throw: Phaser.Input.Keyboard.KeyCodes.SPACE,
+    });
+
+    
+
     this.mobs = this.add.group();
     addMob(this.mobs, this);
 
-    this.enemCount = 0;
     this.lastThrowTime = 0;
 
     this.player = new Player(this, 100, 100, "mushroomPlayer").setOrigin(
@@ -59,25 +71,32 @@ class Play extends Phaser.Scene {
       this.mobs,
       this.handleBombHit,
       () => true,
+      this
     );
-    // arrow func allows processCallback to pass enemy and bomb to handleBombHit
-  }
+    
+    for (let i = 0; i < 20; i++) {
+      addMob(this.mobs, this);
+      this.enemCount ++;
+    }
+    console.log(`Enemies left: ${this.enemCount}`);
+}
 
-  handleBombHit(enemy, bomb) {
-    // VERY IMPORTANT TO KEEP VARS PASSED THIS WAY
+  handleBombHit = (enemy, bomb) => {
     // Decrease enemy health on bomb hit
     enemy.health -= 1;
     enemy.healthText.setText(enemy.health);
     bomb.destroy();
 
-    // If the enemy's health is 0 or less, destroy it
+    // If the enemy's health is 0 or less, destroy it and decrease the enemy count
     if (enemy.health <= 0) {
       enemy.healthText.destroy();
       enemy.destroy();
+      this.enemCount--;
+      console.log(`Animals left... ${this.enemCount}`);
     } else {
       enemy.hit = true; // Mark the enemy as hit
     }
-  }
+  };
 
   update() {
     const { left, right, up, down, throw: throwKey } = this.keys;
@@ -92,11 +111,12 @@ class Play extends Phaser.Scene {
 
     this.player.updateHealthTextPosition();
 
-    while (this.enemCount < 20) {
-      addMob(this.mobs, this);
-      this.enemCount++;
-    }
+    // while (this.enemCount < 20) {
+    //   addMob(this.mobs, this);
+    //   this.enemCount++;
+    // }
     mobMovement(this.mobs, this);
+    this.enemyCountText.setText(`Animals left... ${this.enemCount}`);
   }
 }
 
