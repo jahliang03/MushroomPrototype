@@ -74,7 +74,7 @@ class Play extends Phaser.Scene {
       this
     );
     
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       addMob(this.mobs, this);
       this.enemCount ++;
     }
@@ -111,12 +111,12 @@ class Play extends Phaser.Scene {
 
     this.player.updateHealthTextPosition();
 
-    // while (this.enemCount < 20) {
-    //   addMob(this.mobs, this);
-    //   this.enemCount++;
-    // }
     mobMovement(this.mobs, this);
     this.enemyCountText.setText(`Animals left... ${this.enemCount}`);
+
+    if (this.enemCount <= 0) {
+      this.scene.start("gameOver");
+    }
   }
 }
 
@@ -129,11 +129,11 @@ function mobMovement(mobList, scene) {
     }
     if (
       enemy.hit &&
-      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 700
+      Phaser.Math.Distance.BetweenPoints(enemy, scene.player) < 1000
     ) {
       enemy.setVelocity(
-        enemy.x < scene.player.x ? -enemy.speed * 2 : enemy.speed * 2,
-        enemy.y < scene.player.y ? -enemy.speed * 2 : enemy.speed * 2,
+        enemy.x < scene.player.x ? -enemy.speed * 3 : enemy.speed * 3,
+        enemy.y < scene.player.y ? -enemy.speed * 3 : enemy.speed * 3,
       );
     } else if (
       enemy.hit &&
